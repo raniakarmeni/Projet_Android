@@ -1,68 +1,28 @@
-# Jetpack Compose Codelabs
+# Advanced State in Jetpack Compose Codelab
 
-This repository contains a set of Android Studio projects to help you learn about
-Compose in Android. Each sample contains the code for a specific Compose codelab.
+This folder contains the source code for the
+[Advanced State in Jetpack Compose Codelab](https://developer.android.com/codelabs/jetpack-compose-advanced-state-side-effects)
+codelab.
 
-For more information about Jetpack Compose, please [read the documentation](https://developer.android.com/jetpack/compose)
+The project is built in multiple git branches:
+* `main` – the starter code for this project, you will make changes to this to complete the codelab
+* `end` – contains the solution to this codelab
 
-## 💻 Requirements
+## [Optional] Google Maps SDK setup
 
-[Latest version of Android Studio](https://developer.android.com/studio).
+Seeing the city on the MapView is not necessary to complete the codelab. However, if you want
+to get the MapView to render on the screen, you need to get an API key as
+the [documentation says](https://developers.google.com/maps/documentation/android-sdk/get-api-key),
+and include it in the `local.properties` file as follows:
 
-## 🧬 Codelabs
+```
+MAPS_API_KEY={insert_your_api_key_here}
+```
 
-### [Basics codelab](https://developer.android.com/codelabs/jetpack-compose-basics)
-
-Go hands-on and learn the fundamentals of declarative UI, working with state, layouts and theming.
-
-### [Basic layouts codelab](https://developer.android.com/codelabs/jetpack-compose-layouts)
-
-Learn how to implement real-world designs with the composables and modifiers that Compose provides out of the box.
-
-### [State codelab](https://developer.android.com/codelabs/jetpack-compose-state)
-
-Understand patterns for working with state in a declarative world by building a Wellness application.
-
-### [Theming codelab](https://developer.android.com/codelabs/jetpack-compose-theming)
-
-Go hands on with Compose’s implementation of Material Design to understand how to theme an
-application’s colors, typography and shapes and support light and dark themes.
-
-### [Migration codelab](https://developer.android.com/codelabs/jetpack-compose-migration)
-
-Understand how Jetpack Compose and View-based UIs can co-exist and interact, making it easy to
-adopt Compose at your own pace.
-
-### [Animation codelab](https://developer.android.com/codelabs/jetpack-compose-animation)
-
-Learn how to use Jetpack Compose Animation APIs.
-
-### [Navigation codelab](https://developer.android.com/codelabs/jetpack-compose-navigation)
-
-Learn how to use the Jetpack Navigation library in Compose, navigate within your application,
-navigate with arguments, support deep-links, and test your navigation.
-
-### [Performance codelab](https://developer.android.com/codelabs/jetpack-compose-performance)
-
-Learn how to measure, investigate and improve the runtime performance of a Compose app.
-
-### [Testing codelab](https://developer.android.com/codelabs/jetpack-compose-testing)
-
-Learn about testing Jetpack Compose UIs. Write your first tests, and learn about testing in
-isolation, debugging tests, the semantics tree, and test synchronization.
-
-### [Accessibility codelab](https://developer.android.com/codelabs/jetpack-compose-accessibility)
-
-Learn about the various ways to improve an app’s accessibility. Increase touch target sizes, add
-content descriptions, create custom actions, and more.
-
-### [Adaptive codelab](https://codelabs.developers.google.com/jetpack-compose-adaptability)
- 
-Learn how to build adaptive apps for phones, tablets and foldables with Jetpack Compose. Improve 
-reachability and ergonomics of your app with Material navigation components. 
+When restricting the Key to Android apps, use `androidx.compose.samples.crane` as package name, and
+`A0:BD:B3:B6:F0:C4:BE:90:C6:9D:5F:4C:1D:F0:90:80:7F:D7:FE:1F` as SHA-1 certificate fingerprint.
 
 ## License
-
 ```
 Copyright 2021 The Android Open Source Project
 
