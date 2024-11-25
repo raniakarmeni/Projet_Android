@@ -41,11 +41,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CraneTheme {
-                MainScreen(onExploreItemClicked = {
-                    launchDetailsActivity(
-                        context = this,
-                        item = it
-                    )
+                MainScreenKaraoke (onSongItemClicked = {
                 })
             }
         }
@@ -61,5 +57,12 @@ private fun MainScreen(onExploreItemClicked: OnExploreItemClicked) {
         } else {
             CraneHome(onExploreItemClicked = onExploreItemClicked)
         }
+    }
+}
+
+@Composable
+private fun MainScreenKaraoke(onSongItemClicked: OnSongItemClicked) {
+    Surface(color = MaterialTheme.colors.primary) {
+            KaraokeHome(onSongItemClicked = onSongItemClicked)
     }
 }
