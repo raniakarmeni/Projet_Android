@@ -26,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.samples.crane.details.launchDetailsActivity
 import androidx.compose.samples.crane.ui.CraneTheme
 import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,8 +60,8 @@ private fun MainScreen(onExploreItemClicked: OnExploreItemClicked) {
 }
 
 @Composable
-private fun MainScreenKaraoke(onSongItemClicked: OnSongItemClicked) {
+private fun MainScreenKaraoke(onSongItemClicked: OnSongItemClicked = {}) {
     Surface(color = MaterialTheme.colors.primary) {
-            KaraokeHome(onSongItemClicked = onSongItemClicked)
+        KaraokeHome(onSongItemClicked = onSongItemClicked)
     }
 }

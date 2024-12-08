@@ -17,32 +17,22 @@
 package androidx.compose.samples.crane.home
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.BackdropScaffold
 import androidx.compose.material.BackdropValue
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.samples.crane.base.CraneDrawer
-import androidx.compose.samples.crane.base.CraneTabBar
-import androidx.compose.samples.crane.base.CraneTabs
-import androidx.compose.samples.crane.base.ExploreSection
 import androidx.compose.samples.crane.base.SongSection
-import androidx.compose.samples.crane.data.ExploreModel
 import androidx.compose.samples.crane.data.Song
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.launch
 
 typealias OnSongItemClicked = (Song) -> Unit
 
@@ -61,7 +51,6 @@ fun KaraokeHome(
             CraneDrawer()
         }
     ) {
-        val scope = rememberCoroutineScope()
         KaraokeHomeContent(
             modifier = modifier,
             onSongItemClicked = onSongItemClicked
@@ -69,7 +58,6 @@ fun KaraokeHome(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun KaraokeHomeContent(
     onSongItemClicked: OnSongItemClicked,

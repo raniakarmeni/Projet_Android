@@ -1,19 +1,3 @@
-/*
- * Copyright 2020 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package androidx.compose.samples.crane.data
 
 import javax.inject.Inject
@@ -21,8 +5,17 @@ import javax.inject.Inject
 class SongsRepository @Inject constructor(
     private val songsLocalDataSource: SongsLocalDataSource
 ) {
-    val songs: List<Song> = songsLocalDataSource.songs
+    // Combiner les chansons locales et celles récupérées dynamiquement
+    suspend fun getSongs(): List<Song> {
+        val networkSongs = songsLocalDataSource.fetchSongsFromNetwork()
+        return if (networkSongs.isNotEmpty()) {
+            networkSongs
+        } else {
+            songsLocalDataSource.songs // Fallback aux chansons locales
+        }
+    }
 
+    // Méthode pour trouver une chanson spécifique
     fun getDestination(songName: String): Song? {
         return songsLocalDataSource.songs.firstOrNull {
             it.name == songName
