@@ -37,8 +37,9 @@ class SongsLocalDataSource @Inject constructor() {
             try {
                 Log.d("SongsLocalDataSource", "Fetching playlist...")
                 val playlist = api.fetchPlaylist()
-                Log.d("SongsLocalDataSource", "Fetched ${playlist.size} songs")
-                playlist
+                val filteredPlaylist = playlist.filter { it.path != null }
+                Log.d("SongsLocalDataSource", "Fetched ${filteredPlaylist.size} songs")
+                filteredPlaylist
             } catch (e: Exception) {
                 Log.e("SongsLocalDataSource", "Error fetching playlist", e)
                 emptyList()
