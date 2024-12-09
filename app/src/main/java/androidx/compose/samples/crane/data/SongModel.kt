@@ -16,12 +16,12 @@
 
 package androidx.compose.samples.crane.data
 
-import androidx.compose.runtime.Immutable
+import com.squareup.moshi.Json
 
-@Immutable
-data class Song(
-    val name: String,
-    val artist: String,
-    val locked: Boolean,
-    var path : String
+data class SongModel(
+    @Json(name = "name") val name: String,
+    @Json(name = "artist") val artist: String,
+    @Json(name="locked") val locked : Boolean = false,
+    @Json(name="path") val path : String? = null,
 )
+

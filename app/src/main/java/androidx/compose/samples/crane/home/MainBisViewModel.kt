@@ -1,6 +1,6 @@
 package androidx.compose.samples.crane.home
 
-import androidx.compose.samples.crane.data.Song
+import androidx.compose.samples.crane.data.SongModel
 import androidx.compose.samples.crane.data.SongsRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,8 +15,8 @@ class MainBisViewModel @Inject constructor(
     private val repository: SongsRepository
 ) : ViewModel() {
 
-    private val _songs = MutableStateFlow<List<Song>>(emptyList())
-    val songs: StateFlow<List<Song>> get() = _songs
+    private val _songs = MutableStateFlow<List<SongModel>>(emptyList())
+    val songs: StateFlow<List<SongModel>> get() = _songs
 
     init {
         fetchSongs()

@@ -16,7 +16,6 @@
 
 package androidx.compose.samples.crane.base
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,13 +28,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -45,25 +42,16 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.samples.crane.R
-import androidx.compose.samples.crane.data.ExploreModel
-import androidx.compose.samples.crane.home.OnExploreItemClicked
 import androidx.compose.samples.crane.ui.BottomSheetShape
 import androidx.compose.samples.crane.ui.crane_caption
 import androidx.compose.samples.crane.ui.crane_divider_color
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImagePainter
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest.Builder
 import kotlinx.coroutines.launch
 import androidx.compose.material.FloatingActionButton
-import androidx.compose.samples.crane.data.Song
+import androidx.compose.samples.crane.data.SongModel
 import androidx.compose.samples.crane.home.OnSongItemClicked
 
 
@@ -71,7 +59,7 @@ import androidx.compose.samples.crane.home.OnSongItemClicked
 fun SongSection(
     modifier: Modifier = Modifier,
     title: String,
-    songList: List<Song>,
+    songList: List<SongModel>,
     onItemClicked: OnSongItemClicked
 ) {
     Surface(modifier = modifier.fillMaxSize(), color = Color.White, shape = BottomSheetShape) {
@@ -117,7 +105,7 @@ fun SongSection(
 
 @Composable
 private fun SongList(
-    songList: List<Song>,
+    songList: List<SongModel>,
     onItemClicked: OnSongItemClicked,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState()
@@ -143,7 +131,7 @@ private fun SongList(
 @Composable
 private fun SongItem(
     modifier: Modifier = Modifier,
-    item: Song,
+    item: SongModel,
     onItemClicked: OnSongItemClicked
 ) {
     Row(

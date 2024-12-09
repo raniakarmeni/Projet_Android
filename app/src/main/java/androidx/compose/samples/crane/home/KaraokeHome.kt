@@ -28,13 +28,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.samples.crane.base.CraneDrawer
 import androidx.compose.samples.crane.base.SongSection
-import androidx.compose.samples.crane.data.Song
+import androidx.compose.samples.crane.data.SongModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
-typealias OnSongItemClicked = (Song) -> Unit
+typealias OnSongItemClicked = (SongModel) -> Unit
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
