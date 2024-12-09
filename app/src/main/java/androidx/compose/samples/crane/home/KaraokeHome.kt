@@ -17,22 +17,34 @@
 package androidx.compose.samples.crane.home
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.BackdropScaffold
 import androidx.compose.material.BackdropValue
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.samples.crane.base.CraneDrawer
 import androidx.compose.samples.crane.base.SongSection
 import androidx.compose.samples.crane.data.SongModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 
 typealias OnSongItemClicked = (SongModel) -> Unit
 
@@ -42,6 +54,7 @@ typealias OnSongItemClicked = (SongModel) -> Unit
 fun KaraokeHome(
     onSongItemClicked: OnSongItemClicked,
     modifier: Modifier = Modifier,
+    viewModel: MainBisViewModel = viewModel()
 ) {
     val scaffoldState = rememberScaffoldState()
     Scaffold(
@@ -53,19 +66,28 @@ fun KaraokeHome(
     ) {
         KaraokeHomeContent(
             modifier = modifier,
-            onSongItemClicked = onSongItemClicked
+            onSongItemClicked = onSongItemClicked,
+            viewModel = viewModel // Passer le ViewModel ici
         )
     }
+}
+
+
+fun openSongDetails(context: Context, song: SongModel) {
+    val intent = Intent(context, SongDetailsActivity::class.java).apply {
+        putExtra("SONG_NAME", song.name)
+        putExtra("SONG_LYRICS_URL", "https://gcpa-enssat-24-25.s3.eu-west-3.amazonaws.com/"+song.path)
+    }
+    context.startActivity(intent)
 }
 
 @Composable
 fun KaraokeHomeContent(
     onSongItemClicked: OnSongItemClicked,
     modifier: Modifier = Modifier,
-    viewModel: MainBisViewModel = viewModel(),
+    viewModel: MainBisViewModel = viewModel()
 ) {
-    // TODO Codelab: collectAsStateWithLifecycle step - consume stream of data from the ViewModel
-    // val suggestedDestinations: List<ExploreModel> = remember { emptyList() }
+    val context = LocalContext.current
     val songs by viewModel.songs.collectAsStateWithLifecycle()
 
     BackdropScaffold(
@@ -73,6 +95,10 @@ fun KaraokeHomeContent(
         scaffoldState = rememberBackdropScaffoldState(BackdropValue.Revealed),
         frontLayerScrimColor = Color.Unspecified,
         appBar = {
+            TopAppBar(
+                title = { Text(text = "Karaoke Songs") },
+                backgroundColor = MaterialTheme.colors.primary
+            )
         },
         backLayerContent = {
         },
@@ -80,7 +106,9 @@ fun KaraokeHomeContent(
             SongSection(
                 title = "Explore Songs",
                 songList = songs,
-                onItemClicked = onSongItemClicked
+                onItemClicked = { song ->
+                    openSongDetails(context, song)
+                }
             )
         }
     )

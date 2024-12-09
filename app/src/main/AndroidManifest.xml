@@ -54,6 +54,8 @@
         <activity
             android:name=".details.DetailsActivity"
             android:exported="true" />
+        <activity android:name=".home.SongDetailsActivity"
+            android:exported="true"/>
     </application>
 
 </manifest>
