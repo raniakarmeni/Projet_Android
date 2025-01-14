@@ -19,6 +19,8 @@ package androidx.compose.samples.crane.home
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.os.Looper
+import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.BackdropScaffold
@@ -40,6 +42,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -81,6 +86,23 @@ fun openSongDetails(context: Context, song: SongModel) {
     context.startActivity(intent)
 }
 
+@OptIn(UnstableApi::class)
+fun playSong(context: Context)
+{
+    val videoUri = "https://gcpa-enssat-24-25.s3.eu-west-3.amazonaws.com/Bohemian/Bohemian.mp3"
+    val player = ExoPlayer.Builder(context)
+        .setLooper(Looper.getMainLooper())
+        .build()
+    // Build the media item
+    val mediaItem = MediaItem.fromUri(videoUri)
+    // Set the media item to be played.
+    player.setMediaItem(mediaItem)
+    // Prepare the player.
+    player.prepare()
+    // Start the playback.
+    player.play()
+}
+
 @Composable
 fun KaraokeHomeContent(
     onSongItemClicked: OnSongItemClicked,
@@ -108,6 +130,7 @@ fun KaraokeHomeContent(
                 songList = songs,
                 onItemClicked = { song ->
                     openSongDetails(context, song)
+                    playSong(context)
                 }
             )
         }

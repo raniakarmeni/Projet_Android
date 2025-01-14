@@ -82,6 +82,16 @@ fun LyricsScreen(songName: String, lyricsUrl: String) {
 suspend fun loadLyricsFromPath(path: String): Lyrics? {
     return try {
         val content = java.net.URL(path).readText()
+        val regex = Regex("# soundtrack\\s+(.*)")
+        val matchResult = regex.find(content)
+
+        if (matchResult != null) {
+            val soundtrack = matchResult.groupValues[1]
+            println("Nom du fichier MP3 : $soundtrack")
+        } else {
+            println("Aucun fichier MP3 trouvé.")
+        }
+        println("Lyrics content loaded: $content") // Log pour vérifier le contenu
         parseLyrics(content)
     } catch (e: Exception) {
         e.printStackTrace()
