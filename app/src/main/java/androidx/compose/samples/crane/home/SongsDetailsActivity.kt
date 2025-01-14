@@ -51,13 +51,11 @@ fun LyricsScreen(songName: String, lyricsUrl: String) {
     // Afficher les lignes une par une avec un délai
     LaunchedEffect(lyrics) {
         lyrics?.lyrics?.let { lines ->
-            println("Number of lines parsed: ${lines.size}") // Log du nombre de lignes
             for (line in lines) {
-                println("Displaying line: ${line.text}") // Log pour chaque ligne affichée
                 currentLine = line
-                delay(2000)
+                delay(2000) // Affiche chaque ligne toutes les 2 secondes
             }
-        } ?: println("Lyrics is null or empty")
+        }
     }
 
     Scaffold(
@@ -84,13 +82,18 @@ fun LyricsScreen(songName: String, lyricsUrl: String) {
 suspend fun loadLyricsFromPath(path: String): Lyrics? {
     return try {
         val content = java.net.URL(path).readText()
-        println("Lyrics content loaded: $content") // Log pour vérifier le contenu
         parseLyrics(content)
     } catch (e: Exception) {
         e.printStackTrace()
         null
     }
 }
+
+fun reformatLyrics(content: String): String {
+    val regex = Regex("\\}(\\s*\\{)") // Trouve les cas où "}" est suivi par "{"
+    return content.replace(regex, "}\n{") // Ajoute un saut de ligne entre "}" et "{"
+}
+
 fun parseTimestamp(timestamp: String): Float {
     val parts = timestamp.split(":")
     return if (parts.size == 2) {
@@ -101,15 +104,19 @@ fun parseTimestamp(timestamp: String): Float {
         throw IllegalArgumentException("Invalid timestamp format: $timestamp")
     }
 }
-
 fun parseLyrics(content: String): Lyrics {
-    val lines = content.lines()
+    // Prétraitement pour réorganiser les lignes
+    val formattedContent = reformatLyrics(content)
+    println("Formatted content:\n$formattedContent")
+
+    val lines = formattedContent.lines()
         .filter { it.contains("{") && it.contains("}") } // Filtrer les lignes avec des timestamps
         .mapNotNull { line ->
             try {
                 val firstTimestamp = line.substringAfter("{").substringBefore("}").trim()
                 val timestamp = parseTimestamp(firstTimestamp) // Convertir en secondes
-                val text = line.substringAfter("}").substringBefore("{").trim() // Texte avant le prochain timestamp
+                // Retirer les accolades restantes et extraire le texte nettoyé
+                val text = line.replace(Regex("\\{.*?\\}"), "").trim()
                 println("Parsed line -> Timestamp: $timestamp, Text: $text")
                 KaraokeLine(timestamp, text)
             } catch (e: Exception) {
@@ -125,7 +132,3 @@ fun parseLyrics(content: String): Lyrics {
         lyrics = lines
     )
 }
-
-
-
-
