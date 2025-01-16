@@ -1,9 +1,8 @@
 package androidx.compose.samples.crane.home
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
-import android.os.Looper
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
@@ -18,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.samples.crane.data.KaraokeLine
 import androidx.compose.samples.crane.data.Lyrics
 import androidx.compose.samples.crane.ui.CraneTheme
-import androidx.compose.ui.platform.LocalContext
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -73,34 +71,72 @@ class SongDetailsActivity : ComponentActivity() {
 fun LyricsScreen(songName: String, lyricsUrl: String, player: ExoPlayer?) {
     var lyrics by remember { mutableStateOf<Lyrics?>(null) }
     var currentLine by remember { mutableStateOf<KaraokeLine?>(null) }
-    var soundtrackUrl by remember { mutableStateOf<String?>(null) }
+    var songListenedTime by remember { mutableLongStateOf(0L) }  // Temps de lecture actuel en secondes
 
-    val context = LocalContext.current
     val exoPlayer = rememberUpdatedState(player)
 
     val coroutineScope = rememberCoroutineScope()
 
+    // Charger les paroles et démarrer la musique
     LaunchedEffect(lyricsUrl) {
         coroutineScope.launch(Dispatchers.IO) {
             val result = loadLyricsFromPath(lyricsUrl)
             lyrics = result.first
-            soundtrackUrl = result.second
 
-            // Démarrer la lecture de la chanson si l'URL est disponible
+            // Si le fichier MP3 est trouvé, démarrer la lecture
             result.second?.let { url ->
                 withContext(Dispatchers.Main) {
-                    // Utiliser l'instance de player
                     exoPlayer.value?.let { playSong(it, url) }
                 }
             }
         }
     }
 
-    LaunchedEffect(lyrics) {
+    // Suivi du temps de la chanson
+    LaunchedEffect(exoPlayer.value) {
+        while (true) {
+            delay(1000)  // Attendre 1 seconde
+            // Mise à jour du temps de la chanson
+            songListenedTime = exoPlayer.value?.currentPosition?.div(1000) ?: 0L
+
+            // Log pour voir si la variable songListenedTime se met bien à jour
+            Log.d("LyricsScreen", "Updated song listened time: $songListenedTime")
+
+            // Si la chanson est terminée (currentPosition == duration), on sort de la boucle
+            if (exoPlayer.value?.isPlaying != true) {
+                break
+            }
+        }
+    }
+
+    // Synchroniser les paroles avec le temps de lecture
+    LaunchedEffect(songListenedTime, lyrics) {
         lyrics?.lyrics?.let { lines ->
-            for (line in lines) {
-                currentLine = line
-                delay(2000)
+            val intSongListenedTime = songListenedTime.toInt()
+
+            // Log du temps de la chanson
+            Log.d("LyricsScreen", "Song listened time (sync): $intSongListenedTime")
+
+            // Chercher la ligne qui correspond au temps actuel de la chanson
+            val filteredLines = lines.filter { it.timestamp <= intSongListenedTime }
+
+            // Log pour afficher les lignes filtrées
+            Log.d("LyricsScreen", "Filtered lines: ${filteredLines.map { it.timestamp to it.text }}")
+
+            currentLine = filteredLines.maxByOrNull { it.timestamp }
+
+            // Log pour vérifier la ligne actuelle
+            if (currentLine != null) {
+                Log.d("LyricsScreen", "Current line: ${currentLine?.timestamp} - ${currentLine?.text}")
+            } else {
+                Log.d("LyricsScreen", "No matching line found, taking first line.")
+            }
+
+            // Si aucune ligne n'est trouvée, on prend la première ligne
+            if (currentLine == null) {
+                currentLine = lines.firstOrNull() // Assurez-vous qu'il y a des paroles
+                // Log pour afficher la ligne par défaut
+                Log.d("LyricsScreen", "First line: ${currentLine?.timestamp} - ${currentLine?.text}")
             }
         }
     }
@@ -113,6 +149,7 @@ fun LyricsScreen(songName: String, lyricsUrl: String, player: ExoPlayer?) {
             )
         }
     ) {
+        // Affichage de la ligne actuelle des paroles
         currentLine?.text?.let { line ->
             Text(
                 text = line,
@@ -133,11 +170,7 @@ fun playSong(player: ExoPlayer, songPath : String) {
     player.play()
 }
 
-
-
-
-
-suspend fun loadLyricsFromPath(path: String): Pair<Lyrics?, String?> {
+fun loadLyricsFromPath(path: String): Pair<Lyrics?, String?> {
     return try {
         val content = java.net.URL(path).readText()
         var soundtrackPath: String? = null
@@ -175,11 +208,12 @@ fun parseTimestamp(timestamp: String): Float {
     return if (parts.size == 2) {
         val minutes = parts[0].toIntOrNull() ?: throw IllegalArgumentException("Invalid minutes in timestamp: $timestamp")
         val seconds = parts[1].toFloatOrNull() ?: throw IllegalArgumentException("Invalid seconds in timestamp: $timestamp")
-        minutes * 60 + seconds
+        minutes.toFloat() * 60 + seconds // Convertir minutes en Float avant d'ajouter
     } else {
         throw IllegalArgumentException("Invalid timestamp format: $timestamp")
     }
 }
+
 fun parseLyrics(content: String): Lyrics {
     // Prétraitement pour réorganiser les lignes
     val formattedContent = reformatLyrics(content)
