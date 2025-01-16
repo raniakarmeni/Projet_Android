@@ -28,7 +28,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SongDetailsActivity : ComponentActivity() {
-
     private var player: ExoPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,37 +36,50 @@ class SongDetailsActivity : ComponentActivity() {
         val songName = intent.getStringExtra("SONG_NAME") ?: "Unknown Song"
         val lyricsUrl = intent.getStringExtra("SONG_LYRICS_URL") ?: ""
 
+        // Initialiser le player ici au niveau de l'activité
+        player = ExoPlayer.Builder(this).build()
+
         setContent {
             CraneTheme {
-                LyricsScreen(songName = songName, lyricsUrl = lyricsUrl)
+                LyricsScreen(songName = songName, lyricsUrl = lyricsUrl, player = player)
             }
         }
 
         // Ajouter l'écouteur pour le bouton retour
         onBackPressedDispatcher.addCallback(this) {
             stopMusic()
-            super.onBackPressed()
+            finish()  // Termine l'activité après avoir arrêté la musique
         }
     }
+
     private fun stopMusic() {
         player?.let {
-            it.stop() // Arrêter la lecture de la musique
-            it.release() // Libérer les ressources
-            player = null
+            if (it.isPlaying) {
+                it.stop()
+            }
+            it.release()
         }
+        player = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopMusic() // Garantir que la musique soit arrêtée si l'activité est détruite
     }
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun LyricsScreen(songName: String, lyricsUrl: String) {
+fun LyricsScreen(songName: String, lyricsUrl: String, player: ExoPlayer?) {
     var lyrics by remember { mutableStateOf<Lyrics?>(null) }
     var currentLine by remember { mutableStateOf<KaraokeLine?>(null) }
     var soundtrackUrl by remember { mutableStateOf<String?>(null) }
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
 
-    // Charger les paroles et l'URL de la chanson en arrière-plan
+    val context = LocalContext.current
+    val exoPlayer = rememberUpdatedState(player)
+
+    val coroutineScope = rememberCoroutineScope()
+
     LaunchedEffect(lyricsUrl) {
         coroutineScope.launch(Dispatchers.IO) {
             val result = loadLyricsFromPath(lyricsUrl)
@@ -77,18 +89,18 @@ fun LyricsScreen(songName: String, lyricsUrl: String) {
             // Démarrer la lecture de la chanson si l'URL est disponible
             result.second?.let { url ->
                 withContext(Dispatchers.Main) {
-                    playSong(context, url)
+                    // Utiliser l'instance de player
+                    exoPlayer.value?.let { playSong(it, url) }
                 }
             }
         }
     }
 
-    // Afficher les lignes une par une avec un délai
     LaunchedEffect(lyrics) {
         lyrics?.lyrics?.let { lines ->
             for (line in lines) {
                 currentLine = line
-                delay(2000) // Affiche chaque ligne toutes les 2 secondes
+                delay(2000)
             }
         }
     }
@@ -101,7 +113,6 @@ fun LyricsScreen(songName: String, lyricsUrl: String) {
             )
         }
     ) {
-        // Affichage de la ligne actuelle
         currentLine?.text?.let { line ->
             Text(
                 text = line,
@@ -113,6 +124,18 @@ fun LyricsScreen(songName: String, lyricsUrl: String) {
         } ?: Text("Loading lyrics...", modifier = Modifier.fillMaxSize())
     }
 }
+
+@OptIn(UnstableApi::class)
+fun playSong(player: ExoPlayer, songPath : String) {
+    val mediaItem = MediaItem.fromUri(songPath)
+    player.setMediaItem(mediaItem)
+    player.prepare()
+    player.play()
+}
+
+
+
+
 
 suspend fun loadLyricsFromPath(path: String): Pair<Lyrics?, String?> {
     return try {
@@ -140,24 +163,6 @@ suspend fun loadLyricsFromPath(path: String): Pair<Lyrics?, String?> {
         e.printStackTrace()
         Pair(null, null)
     }
-}
-
-
-
-@OptIn(UnstableApi::class)
-fun playSong(context: Context, songPath : String)
-{
-    val player = ExoPlayer.Builder(context)
-        .setLooper(Looper.getMainLooper())
-        .build()
-    // Build the media item
-    val mediaItem = MediaItem.fromUri(songPath)
-    // Set the media item to be played.
-    player.setMediaItem(mediaItem)
-    // Prepare the player.
-    player.prepare()
-    // Start the playback.
-    player.play()
 }
 
 fun reformatLyrics(content: String): String {
