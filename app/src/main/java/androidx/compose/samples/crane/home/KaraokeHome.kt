@@ -19,6 +19,8 @@ package androidx.compose.samples.crane.home
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.os.Looper
+import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.BackdropScaffold
@@ -40,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.media3.common.MediaItem
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
