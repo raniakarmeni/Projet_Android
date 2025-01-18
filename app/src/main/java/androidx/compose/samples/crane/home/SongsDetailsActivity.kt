@@ -5,19 +5,23 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.OptIn
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.samples.crane.data.KaraokeLine
 import androidx.compose.samples.crane.data.Lyrics
 import androidx.compose.samples.crane.ui.CraneTheme
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.media3.common.MediaItem
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -75,6 +79,9 @@ fun LyricsScreen(songName: String, lyricsUrl: String, player: ExoPlayer?) {
     var lyrics by remember { mutableStateOf<Lyrics?>(null) }
     var currentLine by remember { mutableStateOf<KaraokeLine?>(null) }
     var songListenedTime by remember { mutableLongStateOf(0L) }
+    var isInPause by remember { mutableStateOf(false) }
+    var dots by remember { mutableStateOf("") }
+    var cursorProgress by remember { mutableStateOf(0f) } // Progression initiale du curseur
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -101,41 +108,99 @@ fun LyricsScreen(songName: String, lyricsUrl: String, player: ExoPlayer?) {
         }
     }
 
-    // Synchronisation des paroles
+    // Animation des points de suspension pendant la pause
+    LaunchedEffect(isInPause) {
+        while (isInPause) {
+            dots = when (dots) {
+                "" -> "."
+                "." -> ".."
+                ".." -> "..."
+                else -> ""
+            }
+            delay(500)
+        }
+    }
+
+    // Synchronisation des paroles et calcul du curseur
     LaunchedEffect(songListenedTime, lyrics) {
         lyrics?.lyrics?.let { lines ->
             val filteredLines = lines.filter { it.timestamp <= songListenedTime.toInt() }
             currentLine = filteredLines.maxByOrNull { it.timestamp }
 
+            // Calcul du curseur en fonction du temps de la chanson et de la ligne actuelle
+            currentLine?.let { line ->
+                val progress = (songListenedTime - line.timestamp).toFloat() / 5f // Ajustez le "5f" pour correspondre à la vitesse
+                cursorProgress = progress.coerceIn(0f, 1f)
+            }
+
             Log.d(
                 "LyricsScreen",
-                "Current line: ${currentLine?.timestamp} - ${currentLine?.text}"
+                "Current line: ${currentLine?.timestamp} - ${currentLine?.text}, cursor progress: $cursorProgress"
             )
         }
     }
+
+    // Animation fluide du curseur
+    val animatedCursorProgress by animateFloatAsState(
+        targetValue = cursorProgress,
+        animationSpec = TweenSpec(durationMillis = 100) // Vous pouvez ajuster la durée de l'animation
+    )
 
     Scaffold(
         topBar = {
-            androidx.compose.material.TopAppBar(
-                title = { Text("Now playing: $songName") }
+            TopAppBar(
+                title = { Text("Now playing: $songName") },
+                backgroundColor = Color.Black
             )
         }
     ) {
-        // Affichage des paroles actuelles
-        currentLine?.text?.let { line ->
-            Text(
-                text = line,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                style = androidx.compose.material.MaterialTheme.typography.h5
-            )
-        } ?: Text("Loading lyrics...", modifier = Modifier.fillMaxSize())
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            if (isInPause) {
+                // Afficher les "..." dynamiques pendant la pause
+                Text(
+                    text = dots,
+                    modifier = Modifier.align(androidx.compose.ui.Alignment.Center),
+                    style = androidx.compose.material.MaterialTheme.typography.h6,
+                    color = Color.Gray
+                )
+            } else {
+                // Affichage de la ligne actuelle avec le curseur animé
+                currentLine?.text?.let { line ->
+                    val splitIndex = (animatedCursorProgress * line.length).toInt() // Utiliser la version animée de cursorProgress
+                    val readText = line.substring(0, splitIndex.coerceIn(0, line.length))
+                    val unreadText = line.substring(splitIndex.coerceIn(0, line.length))
+
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(color = Color.Black)) {
+                                append(readText) // Texte déjà lu
+                            }
+                            withStyle(style = SpanStyle(color = Color.Red)) {
+                                append(unreadText) // Texte non lu
+                            }
+                        },
+                        style = androidx.compose.material.MaterialTheme.typography.h5,
+                        modifier = Modifier.align(androidx.compose.ui.Alignment.Center)
+                    )
+                } ?: Text(
+                    text = "Loading lyrics...",
+                    modifier = Modifier.align(androidx.compose.ui.Alignment.Center),
+                    style = androidx.compose.material.MaterialTheme.typography.h6,
+                    color = Color.Gray
+                )
+            }
+        }
     }
 }
 
-@OptIn(UnstableApi::class)
-fun playSong(player: ExoPlayer, songPath : String) {
+
+
+
+fun playSong(player: ExoPlayer, songPath: String) {
     val mediaItem = MediaItem.fromUri(songPath)
     player.setMediaItem(mediaItem)
     player.prepare()
