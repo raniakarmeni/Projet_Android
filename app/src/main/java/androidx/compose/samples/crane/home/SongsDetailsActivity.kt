@@ -95,7 +95,7 @@ fun LyricsScreen(songName: String, lyricsUrl: String, player: ExoPlayer?) {
     // Suivi du temps de la chanson
     LaunchedEffect(player) {
         while (true) {
-            delay(1000)
+            delay(16)
             songListenedTime = player?.currentPosition?.div(1000) ?: 0L
             Log.d("LyricsScreen", "Current song time: $songListenedTime")
         }
