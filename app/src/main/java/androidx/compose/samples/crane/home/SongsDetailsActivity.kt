@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,9 +23,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 
 class SongDetailsActivity : ComponentActivity() {
     private var player: ExoPlayer? = null
+    private var savedPosition: Long = 0L // Pour sauvegarder la position actuelle de lecture
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,35 +36,36 @@ class SongDetailsActivity : ComponentActivity() {
         val songName = intent.getStringExtra("SONG_NAME") ?: "Unknown Song"
         val lyricsUrl = intent.getStringExtra("SONG_LYRICS_URL") ?: ""
 
-        // Initialiser le player ici au niveau de l'activité
+        // Initialiser le player ici au niveau de l’activité
         player = ExoPlayer.Builder(this).build()
+
+        lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onPause(owner: LifecycleOwner) {
+                super.onPause(owner)
+                savedPosition = player?.currentPosition ?: 0L
+                player?.setPlayWhenReady(false) // Met en pause la lecture
+                Log.d("SongDetailsActivity", "Player paused, saved position: $savedPosition")
+            }
+
+            override fun onResume(owner: LifecycleOwner) {
+                super.onResume(owner)
+                player?.seekTo(savedPosition) // Reprendre à la position sauvegardée
+                player?.setPlayWhenReady(true) // Reprend la lecture
+                Log.d("SongDetailsActivity", "Player resumed, position restored: $savedPosition")
+            }
+        })
 
         setContent {
             CraneTheme {
                 LyricsScreen(songName = songName, lyricsUrl = lyricsUrl, player = player)
             }
         }
-
-        // Ajouter l'écouteur pour le bouton retour
-        onBackPressedDispatcher.addCallback(this) {
-            stopMusic()
-            finish()  // Termine l'activité après avoir arrêté la musique
-        }
-    }
-
-    private fun stopMusic() {
-        player?.let {
-            if (it.isPlaying) {
-                it.stop()
-            }
-            it.release()
-        }
-        player = null
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        stopMusic() // Garantir que la musique soit arrêtée si l'activité est détruite
+        player?.release()
+        Log.d("SongDetailsActivity", "Player released onDestroy")
     }
 }
 
@@ -71,9 +74,7 @@ class SongDetailsActivity : ComponentActivity() {
 fun LyricsScreen(songName: String, lyricsUrl: String, player: ExoPlayer?) {
     var lyrics by remember { mutableStateOf<Lyrics?>(null) }
     var currentLine by remember { mutableStateOf<KaraokeLine?>(null) }
-    var songListenedTime by remember { mutableLongStateOf(0L) }  // Temps de lecture actuel en secondes
-
-    val exoPlayer = rememberUpdatedState(player)
+    var songListenedTime by remember { mutableLongStateOf(0L) }
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -83,73 +84,44 @@ fun LyricsScreen(songName: String, lyricsUrl: String, player: ExoPlayer?) {
             val result = loadLyricsFromPath(lyricsUrl)
             lyrics = result.first
 
-            // Si le fichier MP3 est trouvé, démarrer la lecture
             result.second?.let { url ->
                 withContext(Dispatchers.Main) {
-                    exoPlayer.value?.let { playSong(it, url) }
+                    player?.let { playSong(it, url) }
                 }
             }
         }
     }
 
     // Suivi du temps de la chanson
-    LaunchedEffect(exoPlayer.value) {
+    LaunchedEffect(player) {
         while (true) {
-            delay(1000)  // Attendre 1 seconde
-            // Mise à jour du temps de la chanson
-            songListenedTime = exoPlayer.value?.currentPosition?.div(1000) ?: 0L
-
-            // Log pour voir si la variable songListenedTime se met bien à jour
-            Log.d("LyricsScreen", "Updated song listened time: $songListenedTime")
-
-            // Si la chanson est terminée (currentPosition == duration), on sort de la boucle
-            if (exoPlayer.value?.isPlaying != true) {
-                break
-            }
+            delay(1000)
+            songListenedTime = player?.currentPosition?.div(1000) ?: 0L
+            Log.d("LyricsScreen", "Current song time: $songListenedTime")
         }
     }
 
-    // Synchroniser les paroles avec le temps de lecture
+    // Synchronisation des paroles
     LaunchedEffect(songListenedTime, lyrics) {
         lyrics?.lyrics?.let { lines ->
-            val intSongListenedTime = songListenedTime.toInt()
-
-            // Log du temps de la chanson
-            Log.d("LyricsScreen", "Song listened time (sync): $intSongListenedTime")
-
-            // Chercher la ligne qui correspond au temps actuel de la chanson
-            val filteredLines = lines.filter { it.timestamp <= intSongListenedTime }
-
-            // Log pour afficher les lignes filtrées
-            Log.d("LyricsScreen", "Filtered lines: ${filteredLines.map { it.timestamp to it.text }}")
-
+            val filteredLines = lines.filter { it.timestamp <= songListenedTime.toInt() }
             currentLine = filteredLines.maxByOrNull { it.timestamp }
 
-            // Log pour vérifier la ligne actuelle
-            if (currentLine != null) {
-                Log.d("LyricsScreen", "Current line: ${currentLine?.timestamp} - ${currentLine?.text}")
-            } else {
-                Log.d("LyricsScreen", "No matching line found, taking first line.")
-            }
-
-            // Si aucune ligne n'est trouvée, on prend la première ligne
-            if (currentLine == null) {
-                currentLine = lines.firstOrNull() // Assurez-vous qu'il y a des paroles
-                // Log pour afficher la ligne par défaut
-                Log.d("LyricsScreen", "First line: ${currentLine?.timestamp} - ${currentLine?.text}")
-            }
+            Log.d(
+                "LyricsScreen",
+                "Current line: ${currentLine?.timestamp} - ${currentLine?.text}"
+            )
         }
     }
 
     Scaffold(
         topBar = {
             androidx.compose.material.TopAppBar(
-                title = { Text("Now playing: $songName") },
-                backgroundColor = androidx.compose.ui.graphics.Color.Black
+                title = { Text("Now playing: $songName") }
             )
         }
     ) {
-        // Affichage de la ligne actuelle des paroles
+        // Affichage des paroles actuelles
         currentLine?.text?.let { line ->
             Text(
                 text = line,
