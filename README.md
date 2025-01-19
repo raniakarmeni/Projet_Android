@@ -31,7 +31,7 @@ Ce projet est une application de karaoké permettant :
 
 ## **Documentation**
 Pour plus de détails sur l'architecture et le fonctionnement du projet, consultez la documentation complète 
----
+-https://docs.google.com/document/d/1BwPW1xYjW7ioKlnRDFhpiLujtJ2Bl2P6Mylr5YVA3HY/edit?usp=sharing
 
 ## **APK**
 Téléchargez l'application prête à être installée :
