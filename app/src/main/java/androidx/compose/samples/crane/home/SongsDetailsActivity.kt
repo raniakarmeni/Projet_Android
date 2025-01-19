@@ -29,6 +29,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
+import java.io.File
+import java.io.InputStream
+import java.net.URL
 
 class SongDetailsActivity : ComponentActivity() {
     private var player: ExoPlayer? = null
@@ -84,11 +89,12 @@ fun LyricsScreen(songName: String, lyricsUrl: String, player: ExoPlayer?) {
     var cursorProgress by remember { mutableStateOf(0f) } // Progression initiale du curseur
 
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     // Charger les paroles et démarrer la musique
     LaunchedEffect(lyricsUrl) {
         coroutineScope.launch(Dispatchers.IO) {
-            val result = loadLyricsFromPath(lyricsUrl)
+            val result = loadLyricsFromPath(context,lyricsUrl)
             lyrics = result.first
 
             result.second?.let { url ->
@@ -207,9 +213,9 @@ fun playSong(player: ExoPlayer, songPath: String) {
     player.play()
 }
 
-fun loadLyricsFromPath(path: String): Pair<Lyrics?, String?> {
+fun loadLyricsFromPath(context: Context, path: String): Pair<Lyrics?, String?> {
     return try {
-        val content = java.net.URL(path).readText()
+        val content = URL(path).readText()  // Charger le texte des paroles
         var soundtrackPath: String? = null
 
         // Rechercher le nom de la chanson dans le contenu
@@ -220,9 +226,26 @@ fun loadLyricsFromPath(path: String): Pair<Lyrics?, String?> {
             val soundtrack = matchResult.groupValues[1]
             println("Nom du fichier MP3 : $soundtrack")
 
-            // Construire le chemin complet du fichier MP3
-            soundtrackPath = path.substringBeforeLast("/") + "/$soundtrack"
-            println("Nouveau path : $soundtrackPath")
+            // Vérifier si le fichier MP3 est déjà téléchargé localement
+            val localFilePath = context.getFileStreamPath(soundtrack).absolutePath
+
+            if (File(localFilePath).exists()) {
+                println("Le fichier existe déjà localement.")
+                soundtrackPath = localFilePath  // Utiliser le fichier local
+            } else {
+                println("Le fichier n'existe pas localement, téléchargement en cours...")
+                // Télécharger et enregistrer le fichier
+                val inputStream: InputStream = URL(path.substringBeforeLast("/") + "/$soundtrack").openStream()
+                val outputFile = File(context.filesDir, soundtrack)
+
+                // Sauvegarder le fichier téléchargé localement
+                outputFile.outputStream().use { output ->
+                    inputStream.copyTo(output)
+                    println("Fichier MP3 téléchargé et enregistré à : ${outputFile.absolutePath}")
+                }
+
+                soundtrackPath = outputFile.absolutePath  // Chemin du fichier local téléchargé
+            }
         } else {
             println("Aucun fichier MP3 trouvé.")
         }
