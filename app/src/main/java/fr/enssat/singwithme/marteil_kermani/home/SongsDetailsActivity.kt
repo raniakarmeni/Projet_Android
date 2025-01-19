@@ -1,4 +1,4 @@
-package fr.enssat.singwithme.marteil_kermani.home
+package androidx.compose.samples.crane.home
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -16,9 +16,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import fr.enssat.singwithme.marteil_kermani.data.KaraokeLine
-import fr.enssat.singwithme.marteil_kermani.data.Lyrics
-import fr.enssat.singwithme.marteil_kermani.ui.CraneTheme
+import androidx.compose.samples.crane.data.KaraokeLine
+import androidx.compose.samples.crane.data.Lyrics
+import androidx.compose.samples.crane.ui.CraneTheme
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
@@ -84,9 +84,10 @@ class SongDetailsActivity : ComponentActivity() {
 fun LyricsScreen(songName: String, lyricsUrl: String, player: ExoPlayer?) {
     var lyrics by remember { mutableStateOf<Lyrics?>(null) }
     var currentLine by remember { mutableStateOf<KaraokeLine?>(null) }
-    var nextLine by remember { mutableStateOf<KaraokeLine?>(null) }
+    var currentTimestampSegment by remember { mutableStateOf<Pair<Float, String>?>(null) }
+    var nextTimestampSegment by remember { mutableStateOf<Pair<Float, String>?>(null) }
     var songListenedTime by remember { mutableLongStateOf(0L) }
-    var cursorProgress by remember { mutableStateOf(0f) }
+    var segmentProgress by remember { mutableStateOf(0f) }
 
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -94,7 +95,7 @@ fun LyricsScreen(songName: String, lyricsUrl: String, player: ExoPlayer?) {
     // Charger les paroles et démarrer la musique
     LaunchedEffect(lyricsUrl) {
         coroutineScope.launch(Dispatchers.IO) {
-            val result = loadLyricsFromPath(context,lyricsUrl)
+            val result = loadLyricsFromPath(context, lyricsUrl)
             lyrics = result.first
 
             result.second?.let { url ->
@@ -113,38 +114,44 @@ fun LyricsScreen(songName: String, lyricsUrl: String, player: ExoPlayer?) {
         }
     }
 
-    // Synchronisation des paroles et calcul du curseur
+    // Synchronisation des segments de texte et calcul de la progression
     LaunchedEffect(songListenedTime, lyrics) {
         lyrics?.lyrics?.let { lines ->
-            val currentTimestamp = (songListenedTime / 10).toInt() // Convertir en secondes
-            val currentIndex = lines.indexOfLast { it.timestamp <= currentTimestamp }
+            val currentTimestamp = (songListenedTime / 10).toFloat() // Convertir en secondes
+            val currentLineIndex = lines.indexOfLast { it.timestamp <= currentTimestamp }
 
-            if (currentIndex != -1) {
-                currentLine = lines[currentIndex]
-                nextLine = lines.getOrNull(currentIndex + 1)
+            if (currentLineIndex != -1) {
+                currentLine = lines[currentLineIndex]
 
-                val currentLineTimestamp = currentLine!!.timestamp
-                val nextLineTimestamp = nextLine?.timestamp ?: currentLineTimestamp + 5
+                val timestamps = currentLine?.timestamps ?: emptyList()
+                val segmentIndex = timestamps.indexOfLast { it.first <= currentTimestamp }
 
-                val lineDuration = (nextLineTimestamp - currentLineTimestamp).toFloat()
-                val elapsedTime = (songListenedTime / 10f - currentLineTimestamp).toFloat()
+                if (segmentIndex != -1) {
+                    currentTimestampSegment = timestamps[segmentIndex]
+                    nextTimestampSegment = timestamps.getOrNull(segmentIndex + 1)
 
-                cursorProgress = (elapsedTime / lineDuration).coerceIn(0f, 1f)
+                    val currentSegmentTimestamp = currentTimestampSegment!!.first
+                    val nextSegmentTimestamp = nextTimestampSegment?.first ?: (currentSegmentTimestamp + 5)
+
+                    val segmentDuration = (nextSegmentTimestamp - currentSegmentTimestamp).toFloat()
+                    val elapsedTime = (currentTimestamp - currentSegmentTimestamp).toFloat()
+
+                    segmentProgress = (elapsedTime / segmentDuration).coerceIn(0f, 1f)
+                }
             }
         }
     }
 
-    // Animation fluide du curseur
-    val animatedCursorProgress by animateFloatAsState(
-        targetValue = cursorProgress,
-        animationSpec = TweenSpec(durationMillis = 16)
+    // Animation fluide de la progression
+    val animatedSegmentProgress by animateFloatAsState(
+        targetValue = segmentProgress,
+        animationSpec = TweenSpec(durationMillis = 50)
     )
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Now playing: $songName") },
-                backgroundColor = Color.Black
             )
         }
     ) {
@@ -153,53 +160,55 @@ fun LyricsScreen(songName: String, lyricsUrl: String, player: ExoPlayer?) {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Affichage des paroles synchronisées avec curseur
-            currentLine?.text?.let { line ->
-                val splitIndex = (animatedCursorProgress * line.length).toInt()
-                val readText = line.substring(0, splitIndex.coerceIn(0, line.length))
-                val unreadText = line.substring(splitIndex.coerceIn(0, line.length))
+            // Affichage des paroles synchronisées avec le curseur
+            currentLine?.let { line ->
+                currentTimestampSegment?.let { (timestamp, segmentText) ->
+                    val splitIndex = (animatedSegmentProgress * segmentText.length).toInt()
+                    val readText = segmentText.substring(0, splitIndex.coerceIn(0, segmentText.length))
+                    val unreadText = segmentText.substring(splitIndex.coerceIn(0, segmentText.length))
 
-                Box(
-                    modifier = Modifier
-                        .align(androidx.compose.ui.Alignment.Center)
-                        .padding(vertical = 16.dp)
-                ) {
-                    // Mesurer la largeur réelle du texte
-                    val textLayoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
+                    Box(
+                        modifier = Modifier
+                            .align(androidx.compose.ui.Alignment.Center)
+                            .padding(vertical = 16.dp)
+                    ) {
+                        // Mesurer la largeur réelle du texte
+                        val textLayoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
 
-                    // Texte des paroles
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(style = SpanStyle(color = Color.Black)) {
-                                append(readText)
+                        // Texte des paroles
+                        Text(
+                            text = buildAnnotatedString {
+                                withStyle(style = SpanStyle(color = Color.Black)) {
+                                    append(readText)
+                                }
+                                withStyle(style = SpanStyle(color = Color.Red)) {
+                                    append(unreadText)
+                                }
+                            },
+                            style = androidx.compose.material.MaterialTheme.typography.h5,
+                            onTextLayout = { layoutResult ->
+                                textLayoutResult.value = layoutResult
                             }
-                            withStyle(style = SpanStyle(color = Color.Red)) {
-                                append(unreadText)
+                        )
+
+                        // Curseur aligné avec le segment actuel
+                        textLayoutResult.value?.let { layoutResult ->
+                            val textWidth = layoutResult.size.width.toFloat() // Convertir en Float
+                            val cursorX = (animatedSegmentProgress * textWidth).coerceIn(0f, textWidth) // Limiter au texte
+
+                            Canvas(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(32.dp)
+                                    .padding(top = 5.dp)
+                            ) {
+                                drawLine(
+                                    color = Color.Gray,
+                                    start = Offset(cursorX, 0f),
+                                    end = Offset(cursorX, size.height),
+                                    strokeWidth = 6f
+                                )
                             }
-                        },
-                        style = androidx.compose.material.MaterialTheme.typography.h5,
-                        onTextLayout = { layoutResult ->
-                            textLayoutResult.value = layoutResult
-                        }
-                    )
-
-                    // Curseur aligné avec les mots
-                    textLayoutResult.value?.let { layoutResult ->
-                        val textWidth = layoutResult.size.width.toFloat() // Convertir en Float
-                        val cursorX = (animatedCursorProgress * textWidth).coerceIn(0f, textWidth) // Limiter au texte
-
-                        Canvas(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(32.dp)
-                                .padding(top = 5.dp)
-                        ) {
-                            drawLine(
-                                color = Color.Gray,
-                                start = Offset(cursorX, 0f),
-                                end = Offset(cursorX, size.height),
-                                strokeWidth = 6f
-                            )
                         }
                     }
                 }
@@ -288,11 +297,29 @@ fun parseLyrics(content: String): Lyrics {
         .filter { it.contains("{") && it.contains("}") } // Filtrer les lignes avec des timestamps
         .mapNotNull { line ->
             try {
-                val firstTimestamp = line.substringAfter("{").substringBefore("}").trim()
-                val timestamp = parseTimestamp(firstTimestamp) // Convertir en secondes
-                val text = line.replace(Regex("\\{.*?\\}"), "").trim()
-                println("Parsed line -> Timestamp: $timestamp, Text: $text")
-                KaraokeLine(timestamp, text)
+                // Regex pour capturer chaque timestamp et le texte qui le suit
+                val matches = Regex("\\{(\\s*\\d+:\\d+(\\.\\d*)?\\s*)\\}([^\\{]*)")
+                    .findAll(line)
+
+                // Construire une liste de paires (timestamp, texte)
+                val timestamps = matches.map { matchResult ->
+                    val timestampString = matchResult.groupValues[1].trim()
+                    val text = matchResult.groupValues[3].trim()
+                    val timestamp = parseTimestamp(timestampString)
+                    Pair(timestamp, text)
+                }.toList()
+
+                // Si des timestamps valides ont été trouvés, créer une KaraokeLine
+                if (timestamps.isNotEmpty()) {
+                    val fullText = timestamps.joinToString(" ") { it.second }.trim() // Construire le texte complet
+                    KaraokeLine(
+                        timestamp = timestamps.first().first, // Utiliser le premier timestamp comme point de départ
+                        text = fullText,
+                        timestamps = timestamps
+                    )
+                } else {
+                    null
+                }
             } catch (e: Exception) {
                 println("Error parsing line: $line, Exception: ${e.message}")
                 null
@@ -306,3 +333,4 @@ fun parseLyrics(content: String): Lyrics {
         lyrics = lines
     )
 }
+

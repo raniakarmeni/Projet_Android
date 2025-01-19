@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.enssat.singwithme.marteil_kermani.base
+package androidx.compose.samples.crane.base
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Row
@@ -29,9 +29,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.samples.crane.R
-import fr.enssat.singwithme.marteil_kermani.ui.CraneTheme
-import fr.enssat.singwithme.marteil_kermani.ui.captionTextStyle
+import androidx.compose.samples.crane.ui.CraneTheme
+import androidx.compose.samples.crane.ui.captionTextStyle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color

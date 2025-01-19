@@ -9,5 +9,6 @@ data class Lyrics(
 
 data class KaraokeLine(
     val timestamp: Float,
-    var text: String
+    var text: String,
+    val timestamps: List<Pair<Float, String>>
 )

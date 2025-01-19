@@ -51,18 +51,6 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun MainScreen(onExploreItemClicked: OnExploreItemClicked) {
-    Surface(color = MaterialTheme.colors.primary) {
-        var showLandingScreen by remember { mutableStateOf(true) }
-        if (showLandingScreen) {
-            LandingScreen(onTimeout = { showLandingScreen = false })
-        } else {
-            CraneHome(onExploreItemClicked = onExploreItemClicked)
-        }
-    }
-}
-
-@Composable
 private fun MainScreenKaraoke(onSongItemClicked: OnSongItemClicked = {}) {
     Surface(color = MaterialTheme.colors.primary) {
         KaraokeHome(onSongItemClicked = onSongItemClicked)
