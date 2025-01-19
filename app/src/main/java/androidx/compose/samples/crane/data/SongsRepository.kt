@@ -7,18 +7,20 @@ class SongsRepository @Inject constructor(
 ) {
     // Combiner les chansons locales et celles récupérées dynamiquement
     suspend fun getSongs(): List<SongModel> {
-        val networkSongs = songsLocalDataSource.fetchSongs()
-        return if (networkSongs.isNotEmpty()) {
-            networkSongs
+        val songs = songsLocalDataSource.fetchSongs()
+        return if (songs.isNotEmpty()) {
+            songs
         } else {
             songsLocalDataSource.songs // Fallback aux chansons locales
         }
     }
 
-    // Méthode pour trouver une chanson spécifique
-    fun getDestination(songName: String): SongModel? {
-        return songsLocalDataSource.songs.firstOrNull {
-            it.name == songName
+    suspend fun getSongsNetwork(): List<SongModel> {
+        val networkSongs = songsLocalDataSource.fetchSongsFromNetwork()
+        return if (networkSongs.isNotEmpty()) {
+            networkSongs
+        } else {
+            songsLocalDataSource.songs // Fallback aux chansons locales
         }
     }
 }

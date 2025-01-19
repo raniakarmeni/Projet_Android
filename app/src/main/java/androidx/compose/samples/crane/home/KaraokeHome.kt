@@ -19,9 +19,7 @@ package androidx.compose.samples.crane.home
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.os.Looper
-import androidx.annotation.OptIn
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.BackdropScaffold
 import androidx.compose.material.BackdropValue
@@ -34,20 +32,13 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.samples.crane.base.CraneDrawer
-import androidx.compose.samples.crane.base.SongSection
+import androidx.compose.samples.crane.base.SongSectionWrapper
 import androidx.compose.samples.crane.data.SongModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.media3.common.MediaItem
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 
 typealias OnSongItemClicked = (SongModel) -> Unit
 
@@ -106,9 +97,9 @@ fun KaraokeHomeContent(
         backLayerContent = {
         },
         frontLayerContent = {
-            SongSection(
+            SongSectionWrapper(
+                modifier = Modifier.fillMaxSize(),
                 title = "Explore Songs",
-                songList = songs,
                 onItemClicked = { song ->
                     openSongDetails(context, song)
                 }
