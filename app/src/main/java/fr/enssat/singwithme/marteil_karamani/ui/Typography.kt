@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package androidx.compose.samples.crane.ui
+package fr.enssat.singwithme.marteil_karamani.ui
 
 import androidx.compose.material.Typography
-import androidx.compose.samples.crane.R
+import fr.enssat.singwithme.marteil_karamani.R
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily

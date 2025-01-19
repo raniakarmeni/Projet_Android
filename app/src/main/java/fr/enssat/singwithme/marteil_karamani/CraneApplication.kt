@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package androidx.compose.samples.crane.data
+package fr.enssat.singwithme.marteil_karamani
 
-import com.squareup.moshi.Json
+import android.app.Application
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import dagger.hilt.android.HiltAndroidApp
 
-data class SongModel(
-    @Json(name = "name") val name: String,
-    @Json(name = "artist") val artist: String,
-    @Json(name="locked") val locked : Boolean = false,
-    @Json(name="path") val path : String? = null,
-)
+@HiltAndroidApp
+class CraneApplication : Application(), ImageLoaderFactory {
 
+    /**
+     * Create the singleton [ImageLoader].
+     * This is used by [rememberImagePainter] to load images in the app.
+     */
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .build()
+    }
+}

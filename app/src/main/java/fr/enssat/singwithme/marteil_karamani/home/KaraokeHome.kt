@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.samples.crane.home
+package fr.enssat.singwithme.marteil_karamani.home
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -31,9 +31,9 @@ import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.samples.crane.base.KaraokeDrawer
-import androidx.compose.samples.crane.base.SongSectionWrapper
-import androidx.compose.samples.crane.data.SongModel
+import fr.enssat.singwithme.marteil_karamani.base.KaraokeDrawer
+import fr.enssat.singwithme.marteil_karamani.base.SongSectionWrapper
+import fr.enssat.singwithme.marteil_karamani.data.SongModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext

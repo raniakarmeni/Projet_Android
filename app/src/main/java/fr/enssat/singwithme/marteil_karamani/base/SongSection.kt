@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.samples.crane.base
+package fr.enssat.singwithme.marteil_karamani.base
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -43,9 +43,9 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.samples.crane.ui.BottomSheetShape
-import androidx.compose.samples.crane.ui.karaoke_caption
-import androidx.compose.samples.crane.ui.karaoke_divider_color
+import fr.enssat.singwithme.marteil_karamani.ui.BottomSheetShape
+import fr.enssat.singwithme.marteil_karamani.ui.karaoke_caption
+import fr.enssat.singwithme.marteil_karamani.ui.karaoke_divider_color
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,9 +53,9 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.runtime.collectAsState
-import androidx.compose.samples.crane.data.SongModel
-import androidx.compose.samples.crane.home.MainViewModel
-import androidx.compose.samples.crane.home.OnSongItemClicked
+import fr.enssat.singwithme.marteil_karamani.data.SongModel
+import fr.enssat.singwithme.marteil_karamani.home.MainViewModel
+import fr.enssat.singwithme.marteil_karamani.home.OnSongItemClicked
 import androidx.hilt.navigation.compose.hiltViewModel
 
 

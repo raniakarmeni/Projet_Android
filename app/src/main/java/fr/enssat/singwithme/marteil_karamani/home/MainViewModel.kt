@@ -1,7 +1,7 @@
-package androidx.compose.samples.crane.home
+package fr.enssat.singwithme.marteil_karamani.home
 
-import androidx.compose.samples.crane.data.SongModel
-import androidx.compose.samples.crane.data.SongsRepository
+import fr.enssat.singwithme.marteil_karamani.data.SongModel
+import fr.enssat.singwithme.marteil_karamani.data.SongsRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel

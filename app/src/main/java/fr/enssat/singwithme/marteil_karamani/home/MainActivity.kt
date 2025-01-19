@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.samples.crane.home
+package fr.enssat.singwithme.marteil_karamani.home
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -22,8 +22,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.samples.crane.ui.KaraokeTheme
-import androidx.compose.samples.crane.util.PreferencesManager
+import fr.enssat.singwithme.marteil_karamani.ui.KaraokeTheme
+import fr.enssat.singwithme.marteil_karamani.util.PreferencesManager
 import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
 

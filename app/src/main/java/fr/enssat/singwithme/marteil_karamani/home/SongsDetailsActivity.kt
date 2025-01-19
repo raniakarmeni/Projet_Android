@@ -1,4 +1,4 @@
-package androidx.compose.samples.crane.home
+package fr.enssat.singwithme.marteil_karamani.home
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -16,9 +16,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.samples.crane.data.KaraokeLine
-import androidx.compose.samples.crane.data.Lyrics
-import androidx.compose.samples.crane.ui.KaraokeTheme
+import fr.enssat.singwithme.marteil_karamani.data.KaraokeLine
+import fr.enssat.singwithme.marteil_karamani.data.Lyrics
+import fr.enssat.singwithme.marteil_karamani.ui.KaraokeTheme
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.samples.crane.base
+package fr.enssat.singwithme.marteil_karamani.base
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -25,8 +25,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.samples.crane.R
-import androidx.compose.samples.crane.ui.KaraokeTheme
+import fr.enssat.singwithme.marteil_karamani.R
+import fr.enssat.singwithme.marteil_karamani.ui.KaraokeTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource

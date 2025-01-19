@@ -1,4 +1,4 @@
-package androidx.compose.samples.crane.data
+package fr.enssat.singwithme.marteil_karamani.data
 
 val HEYJUDE = SongModel(
     name = "Hey Jude",

@@ -29,17 +29,15 @@ if (rootProject.file("local.properties").exists()) {
 }
 
 android {
-    namespace "androidx.compose.samples.crane"
+    namespace "fr.enssat.singwithme.marteil_karamani"
     compileSdk 35
     defaultConfig {
-        applicationId "androidx.compose.samples.crane"
+        applicationId "fr.enssat.singwithme.marteil_karamani.crane"
         minSdkVersion 21
         targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         vectorDrawables.useSupportLibrary = true
-        testInstrumentationRunner "androidx.compose.samples.crane.CustomTestRunner"
-
         manifestPlaceholders = [MAPS_API_KEY: properties.getProperty("MAPS_API_KEY", "")]
     }
 

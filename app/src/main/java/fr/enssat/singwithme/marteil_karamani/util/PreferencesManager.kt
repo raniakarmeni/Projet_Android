@@ -1,4 +1,4 @@
-package androidx.compose.samples.crane.util
+package fr.enssat.singwithme.marteil_karamani.util
 
 import android.content.Context
 import android.content.SharedPreferences
