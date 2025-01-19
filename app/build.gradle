@@ -85,7 +85,8 @@ android {
 dependencies {
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
     implementation "com.squareup.retrofit2:converter-moshi:2.9.0"
-
+    implementation "androidx.media3:media3-exoplayer:1.0.3"
+    implementation "androidx.media3:media3-ui:1.0.3" // Optionnel : UI pour le lecteur
     // Moshi pour le parsing JSON
     implementation "com.squareup.moshi:moshi-kotlin:1.15.0"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1"
