@@ -52,17 +52,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import androidx.compose.material.FloatingActionButton
+import androidx.compose.runtime.collectAsState
 import androidx.compose.samples.crane.data.SongModel
+import androidx.compose.samples.crane.home.MainBisViewModel
 import androidx.compose.samples.crane.home.OnSongItemClicked
+import androidx.hilt.navigation.compose.hiltViewModel
 
 
 @Composable
 fun SongSection(
     modifier: Modifier = Modifier,
     title: String,
-    songList: List<SongModel>,
-    onItemClicked: OnSongItemClicked
+    onItemClicked: OnSongItemClicked,
+    mainBisViewModel: MainBisViewModel // Utilise ton ViewModel ici
 ) {
+    // Observer l'état des chansons depuis le ViewModel
+    val songList by mainBisViewModel.songs.collectAsState(initial = emptyList())
+
     Surface(modifier = modifier.fillMaxSize(), color = Color.White, shape = BottomSheetShape) {
         Column(modifier = Modifier.padding(start = 24.dp, top = 20.dp, end = 24.dp)) {
             Row(
@@ -78,7 +84,10 @@ fun SongSection(
                     text = "Mettre à jour la playlist",
                     style = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.primary),
                     modifier = Modifier
-                        .clickable { /* Ajoutez ici la logique pour mettre à jour la playlist */ }
+                        .clickable {
+                            // Mettre à jour la playlist en appelant fetchSongsNetwork() dans le ViewModel
+                            mainBisViewModel.fetchSongsNetwork()
+                        }
                         .padding(8.dp)
                 )
             }
@@ -113,6 +122,25 @@ fun SongSection(
         }
     }
 }
+
+
+@Composable
+fun SongSectionWrapper(
+    modifier: Modifier = Modifier,
+    title: String,
+    onItemClicked: OnSongItemClicked
+) {
+    // Utilisation du ViewModel avec Hilt
+    val mainBisViewModel: MainBisViewModel = hiltViewModel()
+
+    SongSection(
+        modifier = modifier,
+        title = title,
+        mainBisViewModel = mainBisViewModel,
+        onItemClicked = onItemClicked
+    )
+}
+
 
 
 @Composable

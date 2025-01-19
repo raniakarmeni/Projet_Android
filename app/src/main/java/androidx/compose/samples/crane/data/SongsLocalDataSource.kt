@@ -46,11 +46,6 @@ class SongsLocalDataSource @Inject constructor() {
         Log.d("SongsLocalDataSource", "Fetching playlist from network...")
         val playlistFromNetwork = fetchSongsFromNetwork()
 
-        // 3. Mettre à jour le cache avec les données récupérées depuis le réseau
-        if (playlistFromNetwork.isNotEmpty()) {
-            cachePlaylist(playlistFromNetwork)
-        }
-
         return playlistFromNetwork
     }
 
@@ -84,6 +79,7 @@ class SongsLocalDataSource @Inject constructor() {
                 val playlist = api.fetchPlaylist()
                 val filteredPlaylist = playlist.filter { it.path != null }
                 Log.d("SongsLocalDataSource", "Fetched ${filteredPlaylist.size} songs")
+                cachePlaylist(filteredPlaylist)
                 filteredPlaylist
             } catch (e: Exception) {
                 Log.e("SongsLocalDataSource", "Error fetching playlist", e)

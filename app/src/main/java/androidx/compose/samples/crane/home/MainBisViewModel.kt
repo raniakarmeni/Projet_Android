@@ -22,9 +22,16 @@ class MainBisViewModel @Inject constructor(
         fetchSongs()
     }
 
-    private fun fetchSongs() {
+    fun fetchSongs() {
         viewModelScope.launch {
             val fetchedSongs = repository.getSongs()
+            _songs.value = fetchedSongs
+        }
+    }
+
+    fun fetchSongsNetwork() {
+        viewModelScope.launch {
+            val fetchedSongs = repository.getSongsNetwork()
             _songs.value = fetchedSongs
         }
     }
