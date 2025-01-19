@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.enssat.singwithme.marteil_kermani.base
+package androidx.compose.samples.crane.base
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -26,7 +26,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.samples.crane.R
-import fr.enssat.singwithme.marteil_kermani.ui.CraneTheme
+import androidx.compose.samples.crane.ui.KaraokeTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 private val screens = listOf("Find Trips", "My Trips", "Saved Trips", "Price Alerts", "My Account")
 
 @Composable
-fun CraneDrawer(modifier: Modifier = Modifier) {
+fun KaraokeDrawer(modifier: Modifier = Modifier) {
     Column(
         modifier
             .fillMaxSize()
@@ -55,8 +55,8 @@ fun CraneDrawer(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-fun CraneDrawerPreview() {
-    CraneTheme {
-        CraneDrawer()
+fun KaraokeDrawerPreview() {
+    KaraokeTheme {
+        KaraokeDrawer()
     }
 }

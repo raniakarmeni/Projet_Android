@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.enssat.singwithme.marteil_kermani.base
+package androidx.compose.samples.crane.base
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -43,9 +43,9 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import fr.enssat.singwithme.marteil_kermani.ui.BottomSheetShape
-import fr.enssat.singwithme.marteil_kermani.ui.crane_caption
-import fr.enssat.singwithme.marteil_kermani.ui.crane_divider_color
+import androidx.compose.samples.crane.ui.BottomSheetShape
+import androidx.compose.samples.crane.ui.karaoke_caption
+import androidx.compose.samples.crane.ui.karaoke_divider_color
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,9 +53,9 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.runtime.collectAsState
-import fr.enssat.singwithme.marteil_kermani.data.SongModel
-import fr.enssat.singwithme.marteil_kermani.home.MainBisViewModel
-import fr.enssat.singwithme.marteil_kermani.home.OnSongItemClicked
+import androidx.compose.samples.crane.data.SongModel
+import androidx.compose.samples.crane.home.MainViewModel
+import androidx.compose.samples.crane.home.OnSongItemClicked
 import androidx.hilt.navigation.compose.hiltViewModel
 
 
@@ -64,10 +64,10 @@ fun SongSection(
     modifier: Modifier = Modifier,
     title: String,
     onItemClicked: OnSongItemClicked,
-    mainBisViewModel: MainBisViewModel // Utilise ton ViewModel ici
+    mainViewModel: MainViewModel // Utilise ton ViewModel ici
 ) {
     // Observer l'état des chansons depuis le ViewModel
-    val songList by mainBisViewModel.songs.collectAsState(initial = emptyList())
+    val songList by mainViewModel.songs.collectAsState(initial = emptyList())
 
     Surface(modifier = modifier.fillMaxSize(), color = Color.White, shape = BottomSheetShape) {
         Column(modifier = Modifier.padding(start = 24.dp, top = 20.dp, end = 24.dp)) {
@@ -77,7 +77,7 @@ fun SongSection(
             ) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.caption.copy(color = crane_caption),
+                    style = MaterialTheme.typography.caption.copy(color = karaoke_caption),
                     modifier = Modifier.weight(1f)
                 )
                 Text(
@@ -86,7 +86,7 @@ fun SongSection(
                     modifier = Modifier
                         .clickable {
                             // Mettre à jour la playlist en appelant fetchSongsNetwork() dans le ViewModel
-                            mainBisViewModel.fetchSongsNetwork()
+                            mainViewModel.fetchSongsNetwork()
                         }
                         .padding(8.dp)
                 )
@@ -131,12 +131,12 @@ fun SongSectionWrapper(
     onItemClicked: OnSongItemClicked
 ) {
     // Utilisation du ViewModel avec Hilt
-    val mainBisViewModel: MainBisViewModel = hiltViewModel()
+    val mainViewModel: MainViewModel = hiltViewModel()
 
     SongSection(
         modifier = modifier,
         title = title,
-        mainBisViewModel = mainBisViewModel,
+        mainViewModel = mainViewModel,
         onItemClicked = onItemClicked
     )
 }
@@ -162,7 +162,7 @@ private fun SongList(
                     item = songItem,
                     onItemClicked = onItemClicked
                 )
-                Divider(color = crane_divider_color)
+                Divider(color = karaoke_divider_color)
             }
         }
     }
@@ -188,7 +188,7 @@ private fun SongItem(
             Spacer(Modifier.height(8.dp))
             Text(
                 text = item.artist,
-                style = MaterialTheme.typography.caption.copy(color = crane_caption)
+                style = MaterialTheme.typography.caption.copy(color = karaoke_caption)
             )
         }
     }

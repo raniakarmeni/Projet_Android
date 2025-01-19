@@ -1,8 +1,8 @@
-package fr.enssat.singwithme.marteil_kermani.data
+package androidx.compose.samples.crane.data
 
 import SongModelJsonAdapter
 import android.util.Log
-import fr.enssat.singwithme.marteil_kermani.util.PreferencesManager
+import androidx.compose.samples.crane.util.PreferencesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit

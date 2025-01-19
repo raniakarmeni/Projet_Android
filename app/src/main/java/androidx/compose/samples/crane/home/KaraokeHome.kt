@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.enssat.singwithme.marteil_kermani.home
+package androidx.compose.samples.crane.home
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -31,9 +31,9 @@ import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import fr.enssat.singwithme.marteil_kermani.base.CraneDrawer
-import fr.enssat.singwithme.marteil_kermani.base.SongSectionWrapper
-import fr.enssat.singwithme.marteil_kermani.data.SongModel
+import androidx.compose.samples.crane.base.KaraokeDrawer
+import androidx.compose.samples.crane.base.SongSectionWrapper
+import androidx.compose.samples.crane.data.SongModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -48,14 +48,14 @@ typealias OnSongItemClicked = (SongModel) -> Unit
 fun KaraokeHome(
     onSongItemClicked: OnSongItemClicked,
     modifier: Modifier = Modifier,
-    viewModel: MainBisViewModel = viewModel()
+    viewModel: MainViewModel = viewModel()
 ) {
     val scaffoldState = rememberScaffoldState()
     Scaffold(
         scaffoldState = scaffoldState,
         modifier = Modifier.statusBarsPadding(),
         drawerContent = {
-            CraneDrawer()
+            KaraokeDrawer()
         }
     ) {
         KaraokeHomeContent(
@@ -79,7 +79,7 @@ fun openSongDetails(context: Context, song: SongModel) {
 fun KaraokeHomeContent(
     onSongItemClicked: OnSongItemClicked,
     modifier: Modifier = Modifier,
-    viewModel: MainBisViewModel = viewModel()
+    viewModel: MainViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val songs by viewModel.songs.collectAsStateWithLifecycle()

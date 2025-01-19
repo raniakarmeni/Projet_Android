@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.enssat.singwithme.marteil_kermani.ui
+package androidx.compose.samples.crane.ui
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -23,20 +23,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-val crane_caption = Color.DarkGray
-val crane_divider_color = Color.LightGray
-private val crane_red = Color(0xFFE30425)
-private val crane_white = Color.White
-private val crane_purple_700 = Color(0xFF720D5D)
-private val crane_purple_800 = Color(0xFF5D1049)
-private val crane_purple_900 = Color(0xFF4E0D3A)
+val karaoke_caption = Color.DarkGray
+val karaoke_divider_color = Color.LightGray
+private val karaoke_red = Color(0xFFE30425)
+private val karaoke_white = Color.White
+private val karaoke_purple_700 = Color(0xFF720D5D)
+private val karaoke_purple_800 = Color(0xFF5D1049)
+private val karaoke_purple_900 = Color(0xFF4E0D3A)
 
-val craneColors = lightColors(
-    primary = crane_purple_800,
-    secondary = crane_red,
-    surface = crane_purple_900,
-    onSurface = crane_white,
-    primaryVariant = crane_purple_700
+val karaokeColors = lightColors(
+    primary = karaoke_purple_800,
+    secondary = karaoke_red,
+    surface = karaoke_purple_900,
+    onSurface = karaoke_white,
+    primaryVariant = karaoke_purple_700
 )
 
 val BottomSheetShape = RoundedCornerShape(
@@ -47,8 +47,8 @@ val BottomSheetShape = RoundedCornerShape(
 )
 
 @Composable
-fun CraneTheme(content: @Composable () -> Unit) {
-    MaterialTheme(colors = craneColors, typography = craneTypography) {
+fun KaraokeTheme(content: @Composable () -> Unit) {
+    MaterialTheme(colors = karaokeColors, typography = karaokeTypography) {
         content()
     }
 }

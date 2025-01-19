@@ -1,7 +1,7 @@
-package fr.enssat.singwithme.marteil_kermani.home
+package androidx.compose.samples.crane.home
 
-import fr.enssat.singwithme.marteil_kermani.data.SongModel
-import fr.enssat.singwithme.marteil_kermani.data.SongsRepository
+import androidx.compose.samples.crane.data.SongModel
+import androidx.compose.samples.crane.data.SongsRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class MainBisViewModel @Inject constructor(
+class MainViewModel @Inject constructor(
     private val repository: SongsRepository
 ) : ViewModel() {
 

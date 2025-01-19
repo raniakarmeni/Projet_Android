@@ -1,4 +1,4 @@
-import fr.enssat.singwithme.marteil_kermani.data.SongModel
+import androidx.compose.samples.crane.data.SongModel
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.ToJson
 

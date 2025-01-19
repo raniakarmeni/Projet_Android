@@ -1,4 +1,4 @@
-package fr.enssat.singwithme.marteil_kermani.data
+package androidx.compose.samples.crane.data
 
 data class Lyrics(
     val title: String,
@@ -9,6 +9,5 @@ data class Lyrics(
 
 data class KaraokeLine(
     val timestamp: Float,
-    var text: String,
-    val timestamps: List<Pair<Float, String>>
+    var text: String
 )

@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package fr.enssat.singwithme.marteil_kermani.base
+package androidx.compose.samples.crane.data
 
-/**
- * A generic class that holds a value.
- * @param <T>
- */
-sealed class Result<out R> {
-    data class Success<out T>(val data: T) : fr.enssat.singwithme.marteil_kermani.base.Result<T>()
-    data class Error(val exception: Exception) : fr.enssat.singwithme.marteil_kermani.base.Result<Nothing>()
-}
+import com.squareup.moshi.Json
+
+data class SongModel(
+    @Json(name = "name") val name: String,
+    @Json(name = "artist") val artist: String,
+    @Json(name="locked") val locked : Boolean = false,
+    @Json(name="path") val path : String? = null,
+)
+
