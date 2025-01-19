@@ -27,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.samples.crane.ui.CraneTheme
+import androidx.compose.samples.crane.util.PreferencesManager
 import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -35,6 +36,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        PreferencesManager.init(this)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 

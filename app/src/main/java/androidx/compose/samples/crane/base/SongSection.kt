@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -64,18 +65,28 @@ fun SongSection(
 ) {
     Surface(modifier = modifier.fillMaxSize(), color = Color.White, shape = BottomSheetShape) {
         Column(modifier = Modifier.padding(start = 24.dp, top = 20.dp, end = 24.dp)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.caption.copy(color = crane_caption)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.caption.copy(color = crane_caption),
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = "Mettre à jour la playlist",
+                    style = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.primary),
+                    modifier = Modifier
+                        .clickable { /* Ajoutez ici la logique pour mettre à jour la playlist */ }
+                        .padding(8.dp)
+                )
+            }
             Spacer(Modifier.height(8.dp))
             Box(Modifier.weight(1f)) {
                 val listState = rememberLazyListState()
                 SongList(songList, onItemClicked, listState = listState)
 
-                // Show the button if the first visible item is past
-                // the first item. We use a remembered derived state to
-                // minimize unnecessary compositions
                 val showButton by remember {
                     derivedStateOf {
                         listState.firstVisibleItemIndex > 0
@@ -102,6 +113,7 @@ fun SongSection(
         }
     }
 }
+
 
 @Composable
 private fun SongList(

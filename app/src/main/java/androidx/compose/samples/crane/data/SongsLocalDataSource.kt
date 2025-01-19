@@ -2,6 +2,7 @@ package androidx.compose.samples.crane.data
 
 import SongModelJsonAdapter
 import android.util.Log
+import androidx.compose.samples.crane.util.PreferencesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
@@ -10,6 +11,7 @@ import retrofit2.http.GET
 import javax.inject.Inject
 import javax.inject.Singleton
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
 @Singleton
@@ -31,11 +33,54 @@ class SongsLocalDataSource @Inject constructor() {
 
     private val api = retrofit.create(PlaylistApi::class.java)
 
-    // Méthode pour récupérer les chansons dynamiquement
+    suspend fun fetchSongs(): List<SongModel> {
+        // 1. Vérifier si la playlist est dans le cache
+        val cachedPlaylist = getCachedPlaylist()
+        if (cachedPlaylist != null) {
+            // Si elle existe dans le cache, la retourner
+            Log.d("SongsLocalDataSource", "Returning cached playlist")
+            return cachedPlaylist
+        }
+
+        // 2. Si la playlist n'est pas dans le cache, la récupérer depuis le réseau
+        Log.d("SongsLocalDataSource", "Fetching playlist from network...")
+        val playlistFromNetwork = fetchSongsFromNetwork()
+
+        // 3. Mettre à jour le cache avec les données récupérées depuis le réseau
+        if (playlistFromNetwork.isNotEmpty()) {
+            cachePlaylist(playlistFromNetwork)
+        }
+
+        return playlistFromNetwork
+    }
+
+    private fun cachePlaylist(playlist: List<SongModel>) {
+        val playlistType = Types.newParameterizedType(List::class.java, SongModel::class.java)
+        val moshiAdapter = moshi.adapter<List<SongModel>>(playlistType)
+        val playlistJson = moshiAdapter.toJson(playlist)
+        PreferencesManager.putString("cached_playlist", playlistJson)
+    }
+
+    private fun getCachedPlaylist(): List<SongModel>? {
+        val playlistType = Types.newParameterizedType(List::class.java, SongModel::class.java)
+        val moshiAdapter = moshi.adapter<List<SongModel>>(playlistType)
+        val cachedJson = PreferencesManager.getString("cached_playlist")
+        return if (cachedJson != null) {
+            try {
+                moshiAdapter.fromJson(cachedJson)
+            } catch (e: Exception) {
+                Log.e("SongsLocalDataSource", "Error parsing cached playlist", e)
+                null
+            }
+        } else {
+            null
+        }
+    }
+
     suspend fun fetchSongsFromNetwork(): List<SongModel> {
         return withContext(Dispatchers.IO) {
             try {
-                Log.d("SongsLocalDataSource", "Fetching playlist...")
+                Log.d("SongsLocalDataSource", "Fetching playlist from network...")
                 val playlist = api.fetchPlaylist()
                 val filteredPlaylist = playlist.filter { it.path != null }
                 Log.d("SongsLocalDataSource", "Fetched ${filteredPlaylist.size} songs")

@@ -7,7 +7,7 @@ class SongsRepository @Inject constructor(
 ) {
     // Combiner les chansons locales et celles récupérées dynamiquement
     suspend fun getSongs(): List<SongModel> {
-        val networkSongs = songsLocalDataSource.fetchSongsFromNetwork()
+        val networkSongs = songsLocalDataSource.fetchSongs()
         return if (networkSongs.isNotEmpty()) {
             networkSongs
         } else {
